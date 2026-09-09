@@ -1,8 +1,20 @@
+# Stage 1: Build Node / Vite assets
+FROM node:20-alpine AS node_builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci || npm install
+COPY . .
+RUN npm run build
+
+# Stage 2: PHP / Nginx production runtime
 FROM richarvey/nginx-php-fpm:3.1.6
 
 WORKDIR /var/www/html
 
 COPY . .
+
+# Copy compiled frontend assets from Node build stage
+COPY --from=node_builder /app/public/build ./public/build
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
@@ -12,10 +24,6 @@ RUN composer install \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader
-
-# Install Node dependencies and build Vite assets
-RUN npm install
-RUN npm run build
 
 # Laravel / Nginx configuration
 ENV WEBROOT=/var/www/html/public
