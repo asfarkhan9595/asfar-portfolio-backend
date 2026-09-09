@@ -4,15 +4,18 @@ WORKDIR /var/www/html
 
 COPY . .
 
-# Allow Composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Install Laravel PHP dependencies
+# Install PHP dependencies
 RUN composer install \
     --no-dev \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader
+
+# Install Node dependencies and build Vite assets
+RUN npm install
+RUN npm run build
 
 # Laravel / Nginx configuration
 ENV WEBROOT=/var/www/html/public
@@ -24,4 +27,5 @@ ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
 
-CMD ["/start.sh"]
+# Run migrations, then start Laravel/Nginx
+CMD ["sh", "-c", "php artisan migrate --force && /start.sh"]
