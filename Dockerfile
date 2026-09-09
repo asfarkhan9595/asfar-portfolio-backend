@@ -25,7 +25,13 @@ RUN composer install \
     --prefer-dist \
     --optimize-autoloader
 
-# Laravel / Nginx configuration
+# Copy custom Nginx configuration for Laravel routing
+COPY conf/nginx/nginx-site.conf /etc/nginx/sites-available/default.conf
+
+# Ensure storage & bootstrap permissions
+RUN chmod -R 775 storage bootstrap/cache
+
+# Environment variables
 ENV WEBROOT=/var/www/html/public
 ENV PHP_ERRORS_STDERR=1
 ENV RUN_SCRIPTS=1
