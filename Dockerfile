@@ -42,4 +42,4 @@ ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
 
 # Run storage symlink, migrations, and seed initial data, then start Laravel/Nginx
-CMD ["sh", "-c", "php artisan storage:link || true && php artisan migrate --force && php artisan db:seed --force && /start.sh"]
+CMD ["sh", "-c", "php artisan storage:link --force; php artisan migrate --force; php artisan db:seed --force; /start.sh"]
