@@ -25,3 +25,4 @@ if (!function_exists('format_image_url')) {
         return asset('storage/' . $cleanPath);
     }
 }
+

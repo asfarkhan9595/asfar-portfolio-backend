@@ -131,7 +131,7 @@
             @endphp
             @if($modalCover)
                 <div class="w-full h-48 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 relative">
-                    <img src="{{ $modalCover }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
+                    <img src="{{ $modalCover }}" alt="{{ $item->title }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.style.display='none';">
                 </div>
             @endif
 

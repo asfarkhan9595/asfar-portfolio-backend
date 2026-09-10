@@ -72,6 +72,28 @@
                 </div>
             </div>
 
+            <!-- COVER IMAGE UPLOAD SECTION -->
+            <div class="mb-8 p-5 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-900/50">
+                <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Project Cover Image (Main Banner)</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Upload Cover File</label>
+                        <input type="file" name="cover_image_file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 p-1.5">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Or Enter Cover Image URL (e.g. Unsplash link)</label>
+                        <input type="text" name="cover_image" value="{{ old('cover_image', $item->cover_image ?? '') }}" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                    </div>
+                </div>
+
+                @if(isset($item) && $item->cover_image)
+                    <div class="mt-3 flex items-center gap-3">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Current Cover Preview:</span>
+                        <img src="{{ format_image_url($item->cover_image) }}" alt="Cover image" class="h-12 w-20 object-cover rounded border border-gray-200 dark:border-gray-700" onerror="this.style.display='none';">
+                    </div>
+                @endif
+            </div>
+
             <!-- PROMINENT MULTIPLE IMAGE UPLOAD SECTION -->
             <div class="mb-8 p-6 border-2 border-dashed border-indigo-500/50 rounded-xl bg-indigo-50/30 dark:bg-gray-900/60">
                 <div class="flex items-center gap-3 mb-2">

@@ -25,13 +25,18 @@ class ProjectController extends Controller
     public function store(Request $request) {
         $request->validate([
             'title' => 'required|string|max:255',
+            'cover_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
         ]);
 
-        $data = $request->except(['images', 'technologies', 'new_technologies']);
+        $data = $request->except(['images', 'technologies', 'new_technologies', 'cover_image_file']);
         $data['featured'] = $request->has('featured');
         $data['is_published'] = $request->has('is_published');
         if (empty($data['slug'])) $data['slug'] = Str::slug($data['title']);
+
+        if ($request->hasFile('cover_image_file')) {
+            $data['cover_image'] = $request->file('cover_image_file')->store('projects/covers', 'public');
+        }
 
         $project = Project::create($data);
 
@@ -72,14 +77,22 @@ class ProjectController extends Controller
     public function update(Request $request, $id) {
         $request->validate([
             'title' => 'required|string|max:255',
+            'cover_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
         ]);
 
         $project = Project::findOrFail($id);
-        $data = $request->except(['images', 'technologies', 'new_technologies']);
+        $data = $request->except(['images', 'technologies', 'new_technologies', 'cover_image_file']);
         $data['featured'] = $request->has('featured');
         $data['is_published'] = $request->has('is_published');
         if (empty($data['slug'])) $data['slug'] = Str::slug($data['title']);
+
+        if ($request->hasFile('cover_image_file')) {
+            if ($project->cover_image && !str_starts_with($project->cover_image, 'http')) {
+                Storage::disk('public')->delete($project->cover_image);
+            }
+            $data['cover_image'] = $request->file('cover_image_file')->store('projects/covers', 'public');
+        }
 
         $project->update($data);
 
