@@ -10,7 +10,7 @@
     $unreadMessages = \App\Models\ContactMessage::where('status', 'new')->orWhere('is_read', false)->count();
     $totalMessages = \App\Models\ContactMessage::count();
     $recentMessages = \App\Models\ContactMessage::latest()->take(4)->get();
-    $recentProjects = \App\Models\Project::with('category')->latest()->take(4)->get();
+    $recentProjects = \App\Models\Project::with(['category', 'images'])->latest()->take(4)->get();
 @endphp
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -82,9 +82,16 @@
                     @foreach($recentProjects as $project)
                         <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3 last:border-0 last:pb-0">
                             <div class="flex items-center gap-3.5 min-w-0">
-                                <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="folder" class="w-5 h-5"></i>
-                                </div>
+                                @php
+                                    $dashThumb = $project->cover_image ? format_image_url($project->cover_image) : ($project->images && $project->images->count() > 0 ? format_image_url($project->images->first()->image_path) : null);
+                                @endphp
+                                @if($dashThumb)
+                                    <img src="{{ $dashThumb }}" alt="{{ $project->title }}" class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0">
+                                @else
+                                    <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="folder" class="w-5 h-5"></i>
+                                    </div>
+                                @endif
                                 <div class="min-w-0">
                                     <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ $project->title }}</h4>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $project->category ? $project->category->name : 'Uncategorized' }}</p>

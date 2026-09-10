@@ -33,9 +33,16 @@
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 flex-shrink-0">
-                                <i data-lucide="briefcase" class="w-5 h-5"></i>
-                            </div>
+                            @php
+                                $thumbUrl = $item->cover_image ? format_image_url($item->cover_image) : ($item->images && $item->images->count() > 0 ? format_image_url($item->images->first()->image_path) : null);
+                            @endphp
+                            @if($thumbUrl)
+                                <img src="{{ $thumbUrl }}" alt="{{ $item->title }}" class="w-10 h-10 rounded-lg object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0">
+                            @else
+                                <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 flex-shrink-0">
+                                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                </div>
+                            @endif
                             <div>
                                 <div class="font-medium text-gray-900 dark:text-white">{{ $item->title }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate max-w-xs">{{ $item->short_description ?? 'No description provided' }}</div>
@@ -119,9 +126,12 @@
 
         <div class="space-y-4">
             <!-- Cover Image & Header Info -->
-            @if($item->cover_image)
+            @php
+                $modalCover = $item->cover_image ? format_image_url($item->cover_image) : ($item->images && $item->images->count() > 0 ? format_image_url($item->images->first()->image_path) : null);
+            @endphp
+            @if($modalCover)
                 <div class="w-full h-48 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 relative">
-                    <img src="{{ asset('storage/' . $item->cover_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
+                    <img src="{{ $modalCover }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
                 </div>
             @endif
 
@@ -236,8 +246,9 @@
                 <span class="block text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-medium mb-2">Project Screenshots / Gallery</span>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     @foreach($item->images as $img)
-                        <a href="{{ asset('storage/' . $img->image_path) }}" target="_blank" class="block h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:opacity-90 transition-opacity">
-                            <img src="{{ asset('storage/' . $img->image_path) }}" class="w-full h-full object-cover">
+                        @php $gUrl = format_image_url($img->image_path); @endphp
+                        <a href="{{ $gUrl }}" target="_blank" class="block h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:opacity-90 transition-opacity">
+                            <img src="{{ $gUrl }}" class="w-full h-full object-cover">
                         </a>
                     @endforeach
                 </div>

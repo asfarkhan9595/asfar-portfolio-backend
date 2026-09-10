@@ -61,7 +61,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         @if($post->cover_image)
-                                            <img src="{{ str_starts_with($post->cover_image, 'http') ? $post->cover_image : asset('storage/' . $post->cover_image) }}" alt="" class="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
+                                            <img src="{{ format_image_url($post->cover_image) }}" alt="" class="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
                                         @else
                                             <div class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400">
                                                 <i data-lucide="image" class="w-5 h-5"></i>

@@ -34,7 +34,7 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 -mt-16 mb-6">
                 <div class="flex items-end gap-4">
                     <img 
-                        src="{{ $item->profile_image ?: 'https://ui-avatars.com/api/?name=' . urlencode($item->name ?: 'Admin') . '&background=6366f1&color=fff&size=128' }}" 
+                        src="{{ format_image_url($item->profile_image, 'https://ui-avatars.com/api/?name=' . urlencode($item->name ?: 'Admin') . '&background=6366f1&color=fff&size=128') }}" 
                         alt="{{ $item->name ?: 'Profile Image' }}"
                         class="w-28 h-28 rounded-2xl border-4 border-white dark:border-gray-800 object-cover shadow-md bg-white dark:bg-gray-700"
                     >
