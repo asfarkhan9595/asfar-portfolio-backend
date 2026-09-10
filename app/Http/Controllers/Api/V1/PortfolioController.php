@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
+
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use App\Models\Project;
@@ -12,9 +13,18 @@ use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
 {
+    protected function getBaseUrl(Request $request): string
+    {
+        $url = $request->schemeAndHttpHost();
+        if (config('app.env') === 'production' || $request->header('X-Forwarded-Proto') === 'https') {
+            return preg_replace('/^http:/i', 'https:', $url);
+        }
+        return $url;
+    }
+
     public function profile(Request $request)
     {
-        $baseUrl = $request->schemeAndHttpHost();
+        $baseUrl = $this->getBaseUrl($request);
         $profile = Profile::first();
         $activeResume = Resume::where('is_active', true)->first();
 
@@ -76,7 +86,7 @@ class PortfolioController extends Controller
 
     protected function transformImageUrls($project, Request $request)
     {
-        $baseUrl = $request->schemeAndHttpHost();
+        $baseUrl = $this->getBaseUrl($request);
 
         if ($project->cover_image && !str_starts_with($project->cover_image, 'http')) {
             $project->cover_image = $baseUrl . '/storage/' . ltrim($project->cover_image, '/');
@@ -120,7 +130,7 @@ class PortfolioController extends Controller
 
     public function posts(Request $request)
     {
-        $baseUrl = $request->schemeAndHttpHost();
+        $baseUrl = $this->getBaseUrl($request);
         $query = \App\Models\Post::published();
 
         if ($request->filled('category') && $request->category !== 'All') {
@@ -164,7 +174,7 @@ class PortfolioController extends Controller
 
     public function post(Request $request, $slug)
     {
-        $baseUrl = $request->schemeAndHttpHost();
+        $baseUrl = $this->getBaseUrl($request);
         $post = \App\Models\Post::published()->where('slug', $slug)->firstOrFail();
         $post->increment('views_count');
 
@@ -221,7 +231,7 @@ class PortfolioController extends Controller
             }
         }
 
-        $baseUrl = $request->schemeAndHttpHost();
+        $baseUrl = $this->getBaseUrl($request);
         foreach (['site_logo', 'site_favicon'] as $imgKey) {
             if (!empty($defaults[$imgKey]) && !str_starts_with($defaults[$imgKey], 'http')) {
                 $defaults[$imgKey] = $baseUrl . '/storage/' . ltrim($defaults[$imgKey], '/');
