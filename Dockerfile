@@ -41,5 +41,5 @@ ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
 
-# Run migrations, then start Laravel/Nginx
-CMD ["sh", "-c", "php artisan migrate --force && /start.sh"]
+# Run migrations and seed initial data, then start Laravel/Nginx
+CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --force && /start.sh"]
