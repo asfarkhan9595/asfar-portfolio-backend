@@ -102,7 +102,10 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                             @foreach($item->images as $img)
                                 <div class="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                                    <img src="{{ asset('storage/' . $img->image_path) }}" alt="Project screenshot" class="h-28 w-full object-cover">
+                                    @php
+                                        $imgPath = str_starts_with($img->image_path, 'http') ? $img->image_path : (str_starts_with($img->image_path, 'storage/') ? asset($img->image_path) : asset('storage/' . ltrim($img->image_path, '/')));
+                                    @endphp
+                                    <img src="{{ $imgPath }}" alt="Project screenshot" class="h-28 w-full object-cover">
                                     <div class="p-2 flex justify-between items-center bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
                                         <span class="text-xs text-gray-400 truncate">Image #{{ $loop->iteration }}</span>
                                         <button type="button" onclick="if(confirm('Delete this image?')) document.getElementById('delete-img-{{ $img->id }}').submit();" class="text-red-500 hover:text-red-700 p-1">
