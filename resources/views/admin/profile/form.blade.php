@@ -46,7 +46,7 @@
     </div>
 
     <div class="bg-white dark:bg-gray-800/80 backdrop-blur-sm shadow-sm rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-        <form id="profileForm" action="{{ route('admin.profile.update') }}" method="POST">
+        <form id="profileForm" action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -93,10 +93,37 @@
                 <textarea id="input_about" name="about" rows="4" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white">{{ $item->about ?? '' }}</textarea>
             </div>
 
-            <!-- Profile Image URL -->
-            <div class="mb-8">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Image URL</label>
-                <input type="text" id="input_profile_image" name="profile_image" value="{{ $item->profile_image ?? '' }}" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" placeholder="https://example.com/image.jpg">
+            <!-- Profile Image (Upload & URL) -->
+            <div class="mb-8 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center gap-2.5 mb-2.5">
+                    <div class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <label for="profile_image_file_input" class="block text-sm font-bold text-gray-900 dark:text-white cursor-pointer hover:text-indigo-600 transition-colors">
+                            Profile Image
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+                    <div>
+                        <input type="file" id="profile_image_file_input" name="profile_image_file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 p-1">
+                    </div>
+                    <div>
+                        <input type="text" id="input_profile_image" name="profile_image" value="{{ $item->profile_image ?? '' }}" placeholder="Or enter relative path / external image URL" class="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                    </div>
+                </div>
+
+                @if(isset($item) && $item->profile_image)
+                    <div class="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-600 flex items-center gap-3">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Current Profile Photo:</span>
+                        @php
+                            $avatarPath = str_starts_with($item->profile_image, 'http') ? $item->profile_image : (str_starts_with($item->profile_image, 'storage/') ? asset($item->profile_image) : asset('storage/' . ltrim($item->profile_image, '/')));
+                        @endphp
+                        <img src="{{ $avatarPath }}" alt="Profile Image Preview" class="h-16 w-16 object-cover rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
+                    </div>
+                @endif
             </div>
 
             <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">

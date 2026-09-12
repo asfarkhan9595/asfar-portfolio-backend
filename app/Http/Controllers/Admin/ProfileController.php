@@ -26,6 +26,11 @@ class ProfileController extends Controller
     public function update(Request $request) {
         $item = Profile::first() ?? new Profile();
         $data = $request->all();
+
+        if ($request->hasFile('profile_image_file')) {
+            $path = $request->file('profile_image_file')->store('profiles', 'public');
+            $data['profile_image'] = $path;
+        }
         
         foreach (['name', 'primary_role', 'hero_supporting_text', 'about'] as $field) {
             if (isset($data[$field])) {
