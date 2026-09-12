@@ -31,7 +31,9 @@ class PortfolioController extends Controller
         if ($profile) {
             $profile->secondary_roles = is_string($profile->secondary_roles) ? json_decode($profile->secondary_roles, true) : $profile->secondary_roles;
             $profile->resume_url = $activeResume ? $baseUrl . '/storage/' . ltrim($activeResume->file_path, '/') : null;
-            if ($profile->profile_image && !str_starts_with($profile->profile_image, 'http')) {
+            if (isset($profile->show_profile_image) && !$profile->show_profile_image) {
+                $profile->profile_image = null;
+            } elseif ($profile->profile_image && !str_starts_with($profile->profile_image, 'http')) {
                 $profile->profile_image = $baseUrl . '/storage/' . ltrim($profile->profile_image, '/');
             }
         }

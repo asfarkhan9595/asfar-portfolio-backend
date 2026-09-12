@@ -93,17 +93,24 @@
                 <textarea id="input_about" name="about" rows="4" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white">{{ $item->about ?? '' }}</textarea>
             </div>
 
-            <!-- Profile Image (Upload & URL) -->
+            <!-- Profile Image (Upload & URL & Toggle) -->
             <div class="mb-8 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
-                <div class="flex items-center gap-2.5 mb-2.5">
-                    <div class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
-                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                <div class="flex items-center justify-between gap-2.5 mb-2.5">
+                    <div class="flex items-center gap-2.5">
+                        <div class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <label for="profile_image_file_input" class="block text-sm font-bold text-gray-900 dark:text-white cursor-pointer hover:text-indigo-600 transition-colors">
+                                Profile Image
+                            </label>
+                        </div>
                     </div>
-                    <div>
-                        <label for="profile_image_file_input" class="block text-sm font-bold text-gray-900 dark:text-white cursor-pointer hover:text-indigo-600 transition-colors">
-                            Profile Image
-                        </label>
-                    </div>
+
+                    <label class="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer select-none bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                        <input type="checkbox" name="show_profile_image" value="1" {{ old('show_profile_image', $item->show_profile_image ?? true) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                        <span>Show Profile Image on Website</span>
+                    </label>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">

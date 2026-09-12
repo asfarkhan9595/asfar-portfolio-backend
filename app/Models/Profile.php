@@ -5,6 +5,9 @@ use Illuminate\Database\Eloquent\Model;
 class Profile extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'primary_role', 'secondary_roles', 'hero_supporting_text', 'about', 'profile_image'];
-    protected $casts = ['secondary_roles' => 'array'];
+    protected $fillable = ['name', 'primary_role', 'secondary_roles', 'hero_supporting_text', 'about', 'profile_image', 'show_profile_image'];
+    protected $casts = [
+        'secondary_roles' => 'array',
+        'show_profile_image' => 'boolean',
+    ];
 }
