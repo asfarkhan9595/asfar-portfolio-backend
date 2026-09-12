@@ -55,3 +55,40 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
     Route::resource('settings', SettingController::class)->only(['index', 'destroy']);
 });
+
+// Dedicated route for downloading active resume
+Route::get('resume/download', function () {
+    $activeResume = \App\Models\Resume::where('is_active', true)->first() ?? \App\Models\Resume::latest()->first();
+    if ($activeResume && $activeResume->file_path) {
+        $path = ltrim($activeResume->file_path, '/');
+        $fullPath = storage_path('app/public/' . $path);
+        if (!file_exists($fullPath)) {
+            $fullPath = storage_path('app/' . $path);
+        }
+        if (file_exists($fullPath)) {
+            return response()->file($fullPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . \Illuminate\Support\Str::slug($activeResume->title) . '.pdf"',
+                'Access-Control-Allow-Origin' => '*',
+            ]);
+        }
+    }
+    abort(404, 'Active resume PDF not found.');
+})->name('resume.download');
+
+// Direct storage fallback route to serve uploaded files if symlink or static server misses
+Route::get('storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) {
+        $filePath = storage_path('app/' . $path);
+    }
+    if (file_exists($filePath)) {
+        $mime = @mime_content_type($filePath) ?: 'application/octet-stream';
+        return response()->file($filePath, [
+            'Content-Type' => $mime,
+            'Access-Control-Allow-Origin' => '*',
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+    abort(404, 'Requested storage file not found.');
+})->where('path', '.*');
