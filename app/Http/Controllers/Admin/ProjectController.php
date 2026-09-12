@@ -157,4 +157,23 @@ class ProjectController extends Controller
 
         return redirect()->back()->with('success', 'Image deleted successfully.');
     }
+
+    public function bulkDestroyImages(Request $request) {
+        $request->validate([
+            'image_ids' => 'required|array',
+            'image_ids.*' => 'exists:project_images,id',
+        ]);
+
+        $images = ProjectImage::whereIn('id', $request->image_ids)->get();
+        $count = $images->count();
+
+        foreach ($images as $image) {
+            if ($image->image_path && !str_starts_with($image->image_path, 'http')) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+            $image->delete();
+        }
+
+        return redirect()->back()->with('success', "{$count} image(s) deleted successfully.");
+    }
 }

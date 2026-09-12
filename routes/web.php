@@ -29,6 +29,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('projects/images/{id}', [ProjectController::class, 'destroyImage'])->name('projects.images.destroy');
+    Route::post('projects/images/bulk-delete', [ProjectController::class, 'bulkDestroyImages'])->name('projects.images.bulk-destroy');
     Route::resource('projects', ProjectController::class);
     Route::patch('project-categories/{id}/toggle-active', [ProjectCategoryController::class, 'toggleActive'])->name('project-categories.toggle-active');
     Route::resource('project-categories', ProjectCategoryController::class)->except(['show']);

@@ -120,17 +120,51 @@
                 
                 @if(isset($item) && $item->images && $item->images->count() > 0)
                     <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
-                        <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Current Uploaded Screenshots ({{ $item->images->count() }})</h4>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                Current Uploaded Screenshots ({{ $item->images->count() }})
+                            </h4>
+
+                            <div class="flex items-center gap-3">
+                                <label class="inline-flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 cursor-pointer select-none">
+                                    <input type="checkbox" id="select_all_screenshots" onchange="toggleSelectAllScreenshots(this)" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span>Select All</span>
+                                </label>
+
+                                <button
+                                    type="button"
+                                    id="bulk_delete_screenshots_btn"
+                                    disabled
+                                    onclick="submitBulkDeleteScreenshots()"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-colors shadow-sm"
+                                >
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    <span>Delete Selected (<span id="selected_count_badge">0</span>)</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                             @foreach($item->images as $img)
                                 <div class="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                                    <!-- Checkbox Overlay -->
+                                    <div class="absolute top-2 left-2 z-10 bg-white/80 dark:bg-gray-900/80 p-1 rounded-md backdrop-blur-sm shadow-sm">
+                                        <input
+                                            type="checkbox"
+                                            value="{{ $img->id }}"
+                                            onchange="updateBulkDeleteUI()"
+                                            class="screenshot-checkbox h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                                        >
+                                    </div>
+
                                     @php
                                         $imgPath = str_starts_with($img->image_path, 'http') ? $img->image_path : (str_starts_with($img->image_path, 'storage/') ? asset($img->image_path) : asset('storage/' . ltrim($img->image_path, '/')));
                                     @endphp
                                     <img src="{{ $imgPath }}" alt="Project screenshot" class="h-28 w-full object-cover">
+
                                     <div class="p-2 flex justify-between items-center bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
-                                        <span class="text-xs text-gray-400 truncate">Image #{{ $loop->iteration }}</span>
-                                        <button type="button" onclick="if(confirm('Delete this image?')) document.getElementById('delete-img-{{ $img->id }}').submit();" class="text-red-500 hover:text-red-700 p-1">
+                                        <span class="text-xs text-gray-400 truncate pl-1">Image #{{ $loop->iteration }}</span>
+                                        <button type="button" onclick="if(confirm('Delete this image?')) document.getElementById('delete-img-{{ $img->id }}').submit();" class="text-red-500 hover:text-red-700 p-1" title="Delete single image">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </div>
@@ -138,6 +172,12 @@
                             @endforeach
                         </div>
                     </div>
+
+                    <!-- Hidden Bulk Delete Form -->
+                    <form id="bulk-delete-images-form" action="{{ route('admin.projects.images.bulk-destroy') }}" method="POST" class="hidden">
+                        @csrf
+                        <div id="bulk-delete-hidden-inputs"></div>
+                    </form>
                 @endif
             </div>
 
@@ -238,6 +278,51 @@ function previewSelectedFiles(input) {
     } else {
         box.classList.add('hidden');
     }
+}
+
+function toggleSelectAllScreenshots(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('.screenshot-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = masterCheckbox.checked;
+    });
+    updateBulkDeleteUI();
+}
+
+function updateBulkDeleteUI() {
+    const checkboxes = document.querySelectorAll('.screenshot-checkbox');
+    const selected = Array.from(checkboxes).filter(cb => cb.checked);
+    const count = selected.length;
+
+    const countBadge = document.getElementById('selected_count_badge');
+    const deleteBtn = document.getElementById('bulk_delete_screenshots_btn');
+    const masterCheckbox = document.getElementById('select_all_screenshots');
+
+    if (countBadge) countBadge.textContent = count;
+    if (deleteBtn) deleteBtn.disabled = count === 0;
+    if (masterCheckbox) {
+        masterCheckbox.checked = checkboxes.length > 0 && selected.length === checkboxes.length;
+    }
+}
+
+function submitBulkDeleteScreenshots() {
+    const checkboxes = document.querySelectorAll('.screenshot-checkbox:checked');
+    if (checkboxes.length === 0) return;
+
+    if (!confirm(`Are you sure you want to delete ${checkboxes.length} selected image(s)?`)) return;
+
+    const form = document.getElementById('bulk-delete-images-form');
+    const container = document.getElementById('bulk-delete-hidden-inputs');
+    container.innerHTML = '';
+
+    checkboxes.forEach(cb => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'image_ids[]';
+        input.value = cb.value;
+        container.appendChild(input);
+    });
+
+    form.submit();
 }
 </script>
 @endsection
