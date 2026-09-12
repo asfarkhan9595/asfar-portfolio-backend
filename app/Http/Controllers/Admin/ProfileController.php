@@ -27,13 +27,31 @@ class ProfileController extends Controller
         $item = Profile::first() ?? new Profile();
         $data = $request->all();
         
+        foreach (['name', 'primary_role', 'hero_supporting_text', 'about'] as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = $this->normalizeText($data[$field]);
+            }
+        }
+
         if (isset($data['secondary_roles'])) {
             $roles = array_filter(array_map('trim', explode(',', $data['secondary_roles'])));
-            $data['secondary_roles'] = array_values($roles);
+            $data['secondary_roles'] = array_values(array_map([$this, 'normalizeText'], $roles));
         }
 
         $item->fill($data);
         $item->save();
         return redirect()->route("admin.profile.show")->with('success', 'Profile updated successfully.');
+    }
+
+    protected function normalizeText(?string $text): ?string {
+        if (!$text) return $text;
+        if (class_exists('Normalizer')) {
+            $text = \Normalizer::normalize($text, \Normalizer::FORM_KC);
+        }
+        return str_replace(
+            ['“', '”', '„', '‘', '’', '–', '—'],
+            ['"', '"', '"', "'", "'", '-', '-'],
+            $text
+        );
     }
 }
