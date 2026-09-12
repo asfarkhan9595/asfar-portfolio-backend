@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\Skill;
 use App\Models\SkillCategory;
@@ -8,7 +10,8 @@ use Illuminate\Support\Str;
 
 class SkillController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $query = Skill::with('category');
 
         // Search Filter
@@ -58,57 +61,95 @@ class SkillController extends Controller
         return view("admin.skills.index", compact('items', 'categories', 'perPage'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:skill_categories,id',
             'sort_order' => 'nullable|integer',
         ]);
 
-        Skill::create([
-            'name' => trim($request->name),
-            'slug' => Str::slug($request->name),
-            'category_id' => $request->category_id,
-            'icon' => $request->icon,
-            'sort_order' => $request->sort_order ?? 0,
-            'is_active' => $request->has('is_active'),
-        ]);
+        try {
+            $baseSlug = Str::slug($request->name);
+            $slug = $baseSlug ?: 'skill';
+            $count = 1;
+            while (Skill::where('slug', $slug)->exists()) {
+                $slug = "{$baseSlug}-{$count}";
+                $count++;
+            }
 
-        return redirect()->route('admin.skills.index')->with('success', 'Skill created successfully.');
+            Skill::create([
+                'name' => trim($request->name),
+                'slug' => $slug,
+                'category_id' => $request->category_id,
+                'icon' => $request->icon,
+                'sort_order' => $request->sort_order ?? 0,
+                'is_active' => $request->has('is_active'),
+            ]);
+
+            return redirect()->route('admin.skills.index')->with('success', 'Skill created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.skills.index')->with('error', 'Failed to create skill: ' . $e->getMessage());
+        }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:skill_categories,id',
             'sort_order' => 'nullable|integer',
         ]);
 
-        $skill = Skill::findOrFail($id);
-        $skill->update([
-            'name' => trim($request->name),
-            'slug' => Str::slug($request->name),
-            'category_id' => $request->category_id,
-            'icon' => $request->icon,
-            'sort_order' => $request->sort_order ?? 0,
-            'is_active' => $request->has('is_active'),
-        ]);
+        try {
+            $skill = Skill::findOrFail($id);
 
-        return redirect()->route('admin.skills.index')->with('success', 'Skill updated successfully.');
+            $baseSlug = Str::slug($request->name);
+            $slug = $baseSlug ?: 'skill';
+            $count = 1;
+            while (Skill::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = "{$baseSlug}-{$count}";
+                $count++;
+            }
+
+            $skill->update([
+                'name' => trim($request->name),
+                'slug' => $slug,
+                'category_id' => $request->category_id,
+                'icon' => $request->icon,
+                'sort_order' => $request->sort_order ?? 0,
+                'is_active' => $request->has('is_active'),
+            ]);
+
+            return redirect()->route('admin.skills.index')->with('success', 'Skill updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.skills.index')->with('error', 'Failed to update skill: ' . $e->getMessage());
+        }
     }
 
-    public function toggleActive($id) {
-        $skill = Skill::findOrFail($id);
-        $skill->update(['is_active' => !$skill->is_active]);
+    public function toggleActive($id)
+    {
+        try {
+            $skill = Skill::findOrFail($id);
+            $skill->update(['is_active' => !$skill->is_active]);
 
-        $statusText = $skill->is_active ? 'Active' : 'Inactive';
-        return redirect()->back()->with('success', "'{$skill->name}' is now {$statusText}.");
+            $statusText = $skill->is_active ? 'Active' : 'Inactive';
+            return redirect()->back()->with('success', "'{$skill->name}' is now {$statusText}.");
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update status: ' . $e->getMessage());
+        }
     }
 
-    public function destroy($id) {
-        $skill = Skill::findOrFail($id);
-        $skill->delete();
+    public function destroy($id)
+    {
+        try {
+            $skill = Skill::findOrFail($id);
+            $skillName = $skill->name;
+            $skill->delete();
 
-        return redirect()->route('admin.skills.index')->with('success', 'Skill deleted successfully.');
+            return redirect()->route('admin.skills.index')->with('success', "Skill '{$skillName}' deleted successfully.");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.skills.index')->with('error', 'Failed to delete skill: ' . $e->getMessage());
+        }
     }
 }

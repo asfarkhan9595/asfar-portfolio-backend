@@ -21,6 +21,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-6 p-4 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 flex items-center gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Search & Filter Controls -->
     <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm">
         <form method="GET" action="{{ route('admin.skills.index') }}" class="flex flex-col sm:flex-row gap-4 items-center justify-between">
