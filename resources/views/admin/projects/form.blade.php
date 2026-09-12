@@ -59,35 +59,34 @@
             </div>
 
             <!-- Cover Image / Main Screenshot -->
-            <div class="mb-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border-2 border-dashed border-indigo-200 dark:border-gray-600">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
-                        <i data-lucide="image" class="w-6 h-6"></i>
+            <div class="mb-5 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center gap-2.5 mb-2.5">
+                    <div class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
+                        <i data-lucide="image" class="w-4 h-4"></i>
                     </div>
                     <div>
-                        <label for="cover_image_file_input" class="block text-base font-bold text-gray-900 dark:text-white cursor-pointer hover:text-indigo-600 transition-colors">
+                        <label for="cover_image_file_input" class="block text-sm font-bold text-gray-900 dark:text-white cursor-pointer hover:text-indigo-600 transition-colors">
                             Project Cover Image / Main Screenshot
                         </label>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Upload a high-quality main screenshot or banner (Max: 5MB) or enter relative path / external image URL.</p>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <input type="file" id="cover_image_file_input" name="cover_image_file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 p-2">
-                    
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Or Image Path / External URL</label>
-                        <input type="text" name="cover_image" value="{{ old('cover_image', $item->cover_image ?? '') }}" placeholder="e.g. projects/covers/xxx.png or https://images.unsplash.com/photo-..." class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                        <input type="file" id="cover_image_file_input" name="cover_image_file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 p-1">
+                    </div>
+                    <div>
+                        <input type="text" name="cover_image" value="{{ old('cover_image', $item->cover_image ?? '') }}" placeholder="Or enter relative path / external image URL" class="w-full px-3 py-1.5 text-xs rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                     </div>
                 </div>
 
                 @if(isset($item) && $item->cover_image)
-                    <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
-                        <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Current Cover Preview:</span>
+                    <div class="mt-3 pt-2.5 border-t border-gray-200 dark:border-gray-600 flex items-center gap-3">
+                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Current Cover Preview:</span>
                         @php
                             $coverPath = str_starts_with($item->cover_image, 'http') ? $item->cover_image : (str_starts_with($item->cover_image, 'storage/') ? asset($item->cover_image) : asset('storage/' . ltrim($item->cover_image, '/')));
                         @endphp
-                        <img src="{{ $coverPath }}" alt="Cover Preview" class="h-36 w-auto object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <img src="{{ $coverPath }}" alt="Cover Preview" class="h-16 w-auto object-cover rounded-md border border-gray-200 dark:border-gray-700 shadow-sm">
                     </div>
                 @endif
             </div>
