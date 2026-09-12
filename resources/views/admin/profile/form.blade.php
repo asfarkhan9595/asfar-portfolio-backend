@@ -123,6 +123,12 @@
             .replace(/[\u2018\u2019\u201A\u201B\u275B\u275C]/g, "'")
             .replace(/[\u2013\u2014\u2015]/g, '-')
             .replace(/\u2026/g, '...');
+
+        // Strip leading/trailing surrounding quotes if whole string is wrapped in quotes
+        clean = clean.trim();
+        if (clean.startsWith('"') && clean.endsWith('"') && clean.length > 2) {
+            clean = clean.slice(1, -1).trim();
+        }
             
         return clean;
     }
