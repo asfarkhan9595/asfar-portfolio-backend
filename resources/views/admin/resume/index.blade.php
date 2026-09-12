@@ -28,24 +28,24 @@
     @endif
 
     <!-- Active Resume Overview Banner -->
-    <div class="mb-8 p-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl relative overflow-hidden">
+    <div class="mb-8 p-6 rounded-2xl bg-indigo-600 text-white shadow-xl relative overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%); color: #ffffff;">
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold uppercase tracking-wider mb-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold uppercase tracking-wider mb-3 text-white" style="background-color: rgba(255, 255, 255, 0.2);">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     Currently Active Resume
                 </div>
                 @if($activeResume)
-                    <h2 class="text-2xl font-bold mb-1">{{ $activeResume->title }}</h2>
-                    <p class="text-xs text-indigo-100">Uploaded on {{ $activeResume->created_at->format('M d, Y') }} • PDF Document</p>
+                    <h2 class="text-2xl font-bold mb-1 text-white">{{ $activeResume->title }}</h2>
+                    <p class="text-xs text-indigo-100" style="color: #e0e7ff;">Uploaded on {{ $activeResume->created_at->format('M d, Y') }} &bull; PDF Document</p>
                 @else
-                    <h2 class="text-xl font-semibold opacity-90">No active resume uploaded yet</h2>
-                    <p class="text-xs text-indigo-100">Upload a PDF below to set your active portfolio resume.</p>
+                    <h2 class="text-xl font-semibold opacity-90 text-white">No active resume uploaded yet</h2>
+                    <p class="text-xs text-indigo-100" style="color: #e0e7ff;">Upload a PDF below to set your active portfolio resume.</p>
                 @endif
             </div>
 
             @if($activeResume)
-                <a href="{{ asset('storage/' . $activeResume->file_path) }}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-700 hover:bg-indigo-50 text-sm font-semibold rounded-xl transition-all shadow-lg">
+                <a href="{{ asset('storage/' . $activeResume->file_path) }}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-700 hover:bg-indigo-50 text-sm font-semibold rounded-xl transition-all shadow-lg" style="background-color: #ffffff; color: #4338ca;">
                     <i data-lucide="file-down" class="w-5 h-5"></i> View / Download Active PDF
                 </a>
             @endif
