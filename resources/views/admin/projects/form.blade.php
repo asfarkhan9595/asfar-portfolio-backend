@@ -16,6 +16,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-6 p-4 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 flex items-center gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <form action="{{ isset($item) ? route('admin.projects.update', $item->id) : route('admin.projects.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -29,74 +36,51 @@
                 </div>
                 <!-- Slug -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug (optional)</label>
-                    <input type="text" name="slug" value="{{ old('slug', $item->slug ?? '') }}" placeholder="auto-generated-if-empty" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug (Auto-generated if empty)</label>
+                    <input type="text" name="slug" value="{{ old('slug', $item->slug ?? '') }}" placeholder="e.g. ai-job-assistant" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
-                
-                <!-- Category -->
+            </div>
+
+            <!-- Category & Sort Order -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
                     <select name="category_id" required class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="">Select a category</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ (old('category_id', $item->category_id ?? '') == $category->id) ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
+                        <option value="">Select Category</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ old('category_id', $item->category_id ?? '') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <!-- Sort Order -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort Order</label>
                     <input type="number" name="sort_order" value="{{ old('sort_order', $item->sort_order ?? 0) }}" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
             </div>
 
-            <!-- Technologies Selection Section -->
-            <div class="mb-8 p-5 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-900/50">
-                <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Technologies Used</label>
-                <div class="flex flex-wrap gap-2 mb-4">
-                    @php
-                        $selectedTechIds = isset($item) ? $item->technologies->pluck('id')->toArray() : [];
-                    @endphp
-                    @foreach($allTechnologies as $tech)
-                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:border-indigo-500 transition-colors">
-                            <input type="checkbox" name="technologies[]" value="{{ $tech->id }}" {{ in_array($tech->id, old('technologies', $selectedTechIds)) ? 'checked' : '' }} class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            {{ $tech->name }}
-                        </label>
-                    @endforeach
+            <!-- Cover Image / Main Screenshot -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Cover Image / Main Screenshot</label>
+                <input type="file" name="cover_image_file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-500/10 dark:file:text-indigo-400 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload a high-quality main screenshot or banner. Max file size: 5MB.</p>
+                <div class="mt-2">
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Or External Cover Image URL (e.g. Unsplash link)</label>
+                    <input type="url" name="cover_image" value="{{ old('cover_image', $item->cover_image ?? '') }}" placeholder="https://images.unsplash.com/photo-..." class="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Add New Technologies (comma-separated if not listed above)</label>
-                    <input type="text" name="new_technologies" placeholder="e.g. Docker, Tailwind CSS, Redis" class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                </div>
-            </div>
-
-            <!-- COVER IMAGE UPLOAD SECTION -->
-            <div class="mb-8 p-5 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-900/50">
-                <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Project Cover Image (Main Banner)</label>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-                    <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Upload Cover File</label>
-                        <input type="file" name="cover_image_file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 p-1.5">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Or Enter Cover Image URL (e.g. Unsplash link)</label>
-                        <input type="text" name="cover_image" value="{{ old('cover_image', $item->cover_image ?? '') }}" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                    </div>
-                </div>
-
                 @if(isset($item) && $item->cover_image)
-                    <div class="mt-3 flex items-center gap-3">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Current Cover Preview:</span>
-                        <img src="{{ format_image_url($item->cover_image) }}" alt="Cover image" class="h-12 w-20 object-cover rounded border border-gray-200 dark:border-gray-700" onerror="this.style.display='none';">
+                    <div class="mt-3">
+                        <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Current Cover Preview:</span>
+                        @php
+                            $coverPath = str_starts_with($item->cover_image, 'http') ? $item->cover_image : (str_starts_with($item->cover_image, 'storage/') ? asset($item->cover_image) : asset('storage/' . ltrim($item->cover_image, '/')));
+                        @endphp
+                        <img src="{{ $coverPath }}" alt="Cover Preview" class="h-32 w-auto object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                     </div>
                 @endif
             </div>
 
-            <!-- PROMINENT MULTIPLE IMAGE UPLOAD SECTION -->
-            <div class="mb-8 p-6 border-2 border-dashed border-indigo-500/50 rounded-xl bg-indigo-50/30 dark:bg-gray-900/60">
-                <div class="flex items-center gap-3 mb-2">
+            <!-- Upload Multiple Screenshots Section -->
+            <div class="mb-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border-2 border-dashed border-indigo-200 dark:border-gray-600">
+                <div class="flex items-center gap-3">
                     <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
                         <i data-lucide="upload-cloud" class="w-6 h-6"></i>
                     </div>
@@ -172,12 +156,6 @@
                             @endforeach
                         </div>
                     </div>
-
-                    <!-- Hidden Bulk Delete Form -->
-                    <form id="bulk-delete-images-form" action="{{ route('admin.projects.images.bulk-destroy') }}" method="POST" class="hidden">
-                        @csrf
-                        <div id="bulk-delete-hidden-inputs"></div>
-                    </form>
                 @endif
             </div>
 
@@ -248,6 +226,7 @@
             </div>
         </form>
 
+        <!-- Hidden Forms Placed Outside Main Project Form -->
         @if(isset($item) && $item->images)
             @foreach($item->images as $img)
                 <form id="delete-img-{{ $img->id }}" action="{{ route('admin.projects.images.destroy', $img->id) }}" method="POST" class="hidden">
@@ -255,6 +234,12 @@
                     @method('DELETE')
                 </form>
             @endforeach
+
+            <!-- Hidden Bulk Delete Form -->
+            <form id="bulk-delete-images-form" action="{{ route('admin.projects.images.bulk-destroy') }}" method="POST" class="hidden">
+                @csrf
+                <div id="bulk-delete-hidden-inputs"></div>
+            </form>
         @endif
     </div>
 </div>
@@ -308,21 +293,47 @@ function submitBulkDeleteScreenshots() {
     const checkboxes = document.querySelectorAll('.screenshot-checkbox:checked');
     if (checkboxes.length === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${checkboxes.length} selected image(s)?`)) return;
+    if (typeof showGlobalDeleteModal === 'function') {
+        showGlobalDeleteModal({
+            message: `Are you sure you want to delete ${checkboxes.length} selected screenshot(s)?`,
+            itemText: `${checkboxes.length} screenshot(s) selected`,
+            onConfirm: function() {
+                const form = document.getElementById('bulk-delete-images-form');
+                if (!form) return;
 
-    const form = document.getElementById('bulk-delete-images-form');
-    const container = document.getElementById('bulk-delete-hidden-inputs');
-    container.innerHTML = '';
+                const container = document.getElementById('bulk-delete-hidden-inputs');
+                if (container) container.innerHTML = '';
 
-    checkboxes.forEach(cb => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'image_ids[]';
-        input.value = cb.value;
-        container.appendChild(input);
-    });
+                checkboxes.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'image_ids[]';
+                    input.value = cb.value;
+                    if (container) container.appendChild(input);
+                });
 
-    form.submit();
+                HTMLFormElement.prototype.submit.call(form);
+            }
+        });
+    } else {
+        if (!confirm(`Are you sure you want to delete ${checkboxes.length} selected screenshot(s)?`)) return;
+
+        const form = document.getElementById('bulk-delete-images-form');
+        if (!form) return;
+
+        const container = document.getElementById('bulk-delete-hidden-inputs');
+        if (container) container.innerHTML = '';
+
+        checkboxes.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'image_ids[]';
+            input.value = cb.value;
+            if (container) container.appendChild(input);
+        });
+
+        HTMLFormElement.prototype.submit.call(form);
+    }
 }
 </script>
 @endsection
