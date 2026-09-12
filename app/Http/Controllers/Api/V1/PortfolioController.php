@@ -39,7 +39,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => $profile
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function projects(Request $request)
@@ -66,7 +66,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => $projects
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function project(Request $request, $slug)
@@ -84,7 +84,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => $project
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     protected function transformImageUrls($project, Request $request)
@@ -110,7 +110,7 @@ class PortfolioController extends Controller
             'data' => SkillCategory::with(['skills' => function($q) {
                 $q->where('is_active', true)->orderBy('sort_order');
             }])->orderBy('sort_order')->get()
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function experience()
@@ -118,7 +118,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => Experience::where('is_published', true)->orderBy('sort_order')->get()
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function socialLinks()
@@ -128,7 +128,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => SocialLinkResource::collection($links)
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function posts(Request $request)
@@ -172,7 +172,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => $posts
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function post(Request $request, $slug)
@@ -206,7 +206,7 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => $postData
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 
     public function settings(Request $request)
@@ -244,6 +244,6 @@ class PortfolioController extends Controller
         return response()->json([
             'success' => true,
             'data' => (object) $defaults
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
     }
 }
