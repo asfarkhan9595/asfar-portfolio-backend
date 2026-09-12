@@ -327,12 +327,8 @@
                     message: msg,
                     itemText: itemText,
                     onConfirm: function() {
-                        if (pendingDeleteForm) {
-                            const f = pendingDeleteForm;
-                            pendingDeleteForm = null;
-                            f.dataset.bypassConfirm = 'true';
-                            f.submit();
-                        }
+                        form.dataset.bypassConfirm = 'true';
+                        HTMLFormElement.prototype.submit.call(form);
                     }
                 });
             }
@@ -363,7 +359,7 @@
                                 const targetForm = document.getElementById(submitMatch[1]);
                                 if (targetForm) {
                                     targetForm.dataset.bypassConfirm = 'true';
-                                    targetForm.submit();
+                                    HTMLFormElement.prototype.submit.call(targetForm);
                                     return;
                                 }
                             }
@@ -379,15 +375,14 @@
             const confirmBtn = document.getElementById('globalDeleteConfirmBtn');
             if (confirmBtn) {
                 confirmBtn.addEventListener('click', function() {
-                    if (pendingDeleteCallback) {
-                        const cb = pendingDeleteCallback;
-                        closeGlobalDeleteModal();
+                    const cb = pendingDeleteCallback;
+                    const f = pendingDeleteForm;
+                    closeGlobalDeleteModal();
+                    if (cb) {
                         cb();
-                    } else if (pendingDeleteForm) {
-                        const f = pendingDeleteForm;
-                        closeGlobalDeleteModal();
+                    } else if (f) {
                         f.dataset.bypassConfirm = 'true';
-                        f.submit();
+                        HTMLFormElement.prototype.submit.call(f);
                     }
                 });
             }
